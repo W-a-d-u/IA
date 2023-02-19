@@ -1,0 +1,33 @@
+import sys #To close program if user pressed close on the gui
+from tkinter import Tk, filedialog, ttk, Button, Label, messagebox
+import magic
+def fileDirectory():
+    root.withdraw()
+    userFile = filedialog.askopenfilename(title="Select Document", filetypes=[("Text files", "*.txt"),("PDF","*.pdf"),("JSON files", "*.json"), ("CSV files", "*.csv")])
+    root.destroy()
+root = Tk()
+#Root is commonly used for the window name so using it here, this is the main window
+root.title("File Directory Prompt")
+root.geometry("300x200")
+root.config(background="#333333")
+root.option_add("*foreground", "orange")
+root_message = Label(root,text="Upload your Document",font=("Arial", 16),bg="#333333", fg="white")
+root_message.pack(pady=25)
+#paddy creates some whitespace(25 pixels of it) of vertical padding
+yes_button = Button(root, text="Open Directory", command=fileDirectory, bg="#ec9006", fg="white")
+yes_button.pack(side="left", padx=40, pady=20)
+#Button if pressed opens the file directory to then select a file
+no_button = Button(root, text="     Close     ", command=sys.exit, bg="#ec9006", fg="white")
+no_button.pack(side="right", padx=40, pady=20)
+#Button if pressed ends code
+
+root.mainloop()
+#starts the tkinter waiting for user input
+
+#def pdf(file):
+#def json(file):
+#def txt(file):
+#def csv(v):
+#def parseText():
+#def wordCloud():
+
