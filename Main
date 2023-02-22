@@ -7,28 +7,24 @@ from tkinter import Tk, filedialog, Button, Label, messagebox  # For the file di
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 
-nltk.download('punkt')  # For tokenizing the string
-nltk.download('averaged_perceptron_tagger')  # Tagging the part of speech
-nltk.download('wordnet')  # Lemmatization
-nltk.download('stopwords')
-nltk.download('words')
 
 
-def data_preprocessing(text):
+
+def data_preprocessing(text): #Takes the string, converts to lowercase removes stop words, puncuation, adds part of speech tag (which is converted to wordNet tags) and then lemmatizes(using the pos tags). Then returns the frequency + word
     english_words = set(nltk.corpus.words.words())
     text = text.lower()
-    tokens = nltk.word_tokenize(text)  # Tokens are now a list of every word in the string including punctuation
+    tokens = nltk.word_tokenize(text)  
     stop_words = set(stopwords.words('english'))
     manual_stop = [item for item in input(
         "Any words you would like to remove if seen to often in previous word cloud(seperate with space): ").split()]
-    print("Words Manually Removed: "), print(manual_stop), print("Processing...")
+    print("Words Manually Removed: "), print(manual_stop), print("Processing...\n")
     remove_stop = []
     for word in tokens:
         if word not in stop_words and word not in manual_stop:
             remove_stop.append(word)
     tags = nltk.pos_tag(remove_stop)
     punctRemoved = [(word, tag) for word, tag in tags if word[
-        0] not in string.punctuation]  # Append word for each word in tokens if the word is not in the list of punctuation
+        0] not in string.punctuation]  
     tag_conversion = {
         'N': 'n',
         'V': 'v',
@@ -68,7 +64,7 @@ def black_color_func(word, font_size, position, orientation, random_state=None,
 
 
 def wordCloud(wordFreqList, max_word):
-    print("Processing...")
+    print("Creating Word Cloud...")
     wc = WordCloud(background_color="white", width=3500, height=3500, max_words=max_word)
     wc.generate_from_frequencies(dict(wordFreqList))
     wc.recolor(color_func=black_color_func)
@@ -84,13 +80,13 @@ def fileDirectory():  # Open directory, check file type and do appropraite funct
     root.destroy()
     if userFile.endswith('.txt'):
         name = userFile.split("/")
-        print(name[-1] + " Selected")
+        print(name[-1] + " Selected \n Processing...\n")
         with open(userFile, 'r') as textFile:
             text = textFile.read()
             data_preprocessing(text)
     elif userFile.endswith('.pdf'):
         name = userFile.split("/")
-        print(name[-1] + " Selected")
+        print(name[-1] + " Selected\n Processing...\n")
         pdfText = pdfToString(userFile)
         data_preprocessing(pdfText)
     else:
