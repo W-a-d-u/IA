@@ -8,12 +8,15 @@ from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 
 
+
 nltk.download('punkt')  #For tokenizing the string
 nltk.download('averaged_perceptron_tagger')  #Tagging the part of speech
 nltk.download('wordnet')  #Lemmatization
 nltk.download('stopwords')
+nltk.download('words')
 
 def data_preprocessing(text):
+    english_words = set(nltk.corpus.words.words())
     text = text.lower()
     tokens = nltk.word_tokenize(text)  # Tokens are now a list of every word in the string including punctuation
     stop_words = set(stopwords.words('english'))
@@ -48,11 +51,11 @@ def data_preprocessing(text):
                 found = True
                 break
         if not found:
-            word_frequency.append((word, 1))
-    for i, item in enumerate(word_frequency):
-      if "'" in item[0]:
-        word_frequency.remove(item)
-    return wordCloud(word_frequency,int(input("How many words do you want to be in your word cloud?(Suggested 100-500): ")))
+            if word in english_words: word_frequency.append((word, 1))
+
+
+
+    return wordCloud(word_frequency,int(input("How many words do you want to be in your word cloud?(Suggested 100-1000): ")))
 
 
 def black_color_func(word, font_size, position,orientation,random_state=None, **kwargs): #Found this online to recolor source:https://towardsdatascience.com/how-to-make-word-clouds-in-python-that-dont-suck-86518cdcb61f
