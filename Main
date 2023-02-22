@@ -1,31 +1,34 @@
 import sys  # To close program if user pressed close on the gui
 from nltk.corpus import stopwords, wordnet
-import nltk  #natural language toolkit
+import nltk  # natural language toolkit
 import PyPDF2
 import string
-from tkinter import Tk, filedialog, Button, Label, messagebox  #For the file directory and simple gui
+from tkinter import Tk, filedialog, Button, Label, messagebox  # For the file directory and simple gui
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 
-
-
-nltk.download('punkt')  #For tokenizing the string
-nltk.download('averaged_perceptron_tagger')  #Tagging the part of speech
-nltk.download('wordnet')  #Lemmatization
+nltk.download('punkt')  # For tokenizing the string
+nltk.download('averaged_perceptron_tagger')  # Tagging the part of speech
+nltk.download('wordnet')  # Lemmatization
 nltk.download('stopwords')
 nltk.download('words')
+
 
 def data_preprocessing(text):
     english_words = set(nltk.corpus.words.words())
     text = text.lower()
     tokens = nltk.word_tokenize(text)  # Tokens are now a list of every word in the string including punctuation
     stop_words = set(stopwords.words('english'))
+    manual_stop = [item for item in input(
+        "Any words you would like to remove if seen to often in previous word cloud(seperate with space): ").split()]
+    print("Words Manually Removed: "), print(manual_stop), print("Processing...")
     remove_stop = []
     for word in tokens:
-        if word not in stop_words:
+        if word not in stop_words and word not in manual_stop:
             remove_stop.append(word)
     tags = nltk.pos_tag(remove_stop)
-    punctRemoved = [(word, tag) for word, tag in tags if word[0] not in string.punctuation]  # Append word for each word in tokens if the word is not in the list of punctuation
+    punctRemoved = [(word, tag) for word, tag in tags if word[
+        0] not in string.punctuation]  # Append word for each word in tokens if the word is not in the list of punctuation
     tag_conversion = {
         'N': 'n',
         'V': 'v',
@@ -33,15 +36,18 @@ def data_preprocessing(text):
         'J': 'a'
     }
     lemmatized = []
-    for word, tag in punctRemoved: #For the word,tag tuple in punctremoved it is converting the 'averaged_perceptron_tagger' pos tag to wordnet tag to lemmatize. I get the tag from punct and then use a dictionary to look up the value for the key tag
+    for word, tag in punctRemoved:  # For the word,tag tuple in punctremoved it is converting the 'averaged_perceptron_tagger' pos tag to wordnet tag to lemmatize. I get the tag from punct and then use a dictionary to look up the value for the key tag
         wordNet_tag = tag_conversion.get(tag[0], None)
         if wordNet_tag is not None:
-            lemmas = wordnet._morphy(word, wordNet_tag) #Morphy returns list of possible lemmmas or if there are none just returns the word
+            lemmas = wordnet._morphy(word,
+                                     wordNet_tag)  # Morphy returns list of possible lemmmas or if there are none just returns the word
             if lemmas:
                 lemmatized.append(lemmas[0])
             else:
                 lemmatized.append(word)
-
+    for word in lemmatized:
+        if word in stop_words or word in manual_stop:
+            lemmatized.remove(word)
     word_frequency = []
     for word in lemmatized:
         found = False
@@ -52,16 +58,17 @@ def data_preprocessing(text):
                 break
         if not found:
             if word in english_words: word_frequency.append((word, 1))
+    return wordCloud(word_frequency,
+                     int(input("How many words do you want to be in your word cloud?(Suggested 100-1000): ")))
 
 
+def black_color_func(word, font_size, position, orientation, random_state=None,
+                     **kwargs):  # Found this online to recolor source:https://towardsdatascience.com/how-to-make-word-clouds-in-python-that-dont-suck-86518cdcb61f
+    return ("hsl(0,100%, 1%)")
 
-    return wordCloud(word_frequency,int(input("How many words do you want to be in your word cloud?(Suggested 100-1000): ")))
 
-
-def black_color_func(word, font_size, position,orientation,random_state=None, **kwargs): #Found this online to recolor source:https://towardsdatascience.com/how-to-make-word-clouds-in-python-that-dont-suck-86518cdcb61f
-    return("hsl(0,100%, 1%)")
-
-def wordCloud(wordFreqList,max_word):
+def wordCloud(wordFreqList, max_word):
+    print("Processing...")
     wc = WordCloud(background_color="white", width=3500, height=3500, max_words=max_word)
     wc.generate_from_frequencies(dict(wordFreqList))
     wc.recolor(color_func=black_color_func)
@@ -70,48 +77,54 @@ def wordCloud(wordFreqList,max_word):
     plt.show()
 
 
-def fileDirectory():     # Open directory, check file type and do appropraite function
+def fileDirectory():  # Open directory, check file type and do appropraite function
     root.withdraw()
-    userFile = filedialog.askopenfilename(title="Select Document", filetypes=[("Text files", "*.txt"),("PDF files","*.pdf")])
+    userFile = filedialog.askopenfilename(title="Select Document",
+                                          filetypes=[("Text files", "*.txt"), ("PDF files", "*.pdf")])
     root.destroy()
     if userFile.endswith('.txt'):
+        name = userFile.split("/")
+        print(name[-1] + " Selected")
         with open(userFile, 'r') as textFile:
             text = textFile.read()
             data_preprocessing(text)
     elif userFile.endswith('.pdf'):
+        name = userFile.split("/")
+        print(name[-1] + " Selected")
         pdfText = pdfToString(userFile)
         data_preprocessing(pdfText)
     else:
         messagebox.showerror("Error", "Invalid file type")
+
 
 def pdfToString(userFile):
     string = ""
     pdfObj = open(userFile, 'rb')
     pdfReader = PyPDF2.PdfReader(pdfObj)
     pageNum = len(pdfReader.pages)
-    if(pageNum) < 2:
+    if (pageNum) < 2:
         page = pdfReader.pages[0]
         return page.extract_text()
     else:
-        for pages in range(0,pageNum-1):
+        for pages in range(0, pageNum - 1):
             page = pdfReader.pages[pages]
             string += page.extract_text()
         return string
 
+
 root = Tk()
-#Root is commonly used for the window name so using it here, this is the main window
+# Root is commonly used for the window name so using it here, this is the main window
 root.title("File Directory Prompt")
 root.geometry("300x200")
 root.config(background="#333333")
 root.option_add("*foreground", "orange")
-root_message = Label(root,text="Upload your Document",font=("Arial", 16),bg="#333333", fg="white")
+root_message = Label(root, text="Upload your Document", font=("Arial", 16), bg="#333333", fg="white")
 root_message.pack(pady=25)
-#paddy creates some whitespace(25 pixels of it) of vertical padding
+# paddy creates some whitespace(25 pixels of it) of vertical padding
 yes_button = Button(root, text="Open Directory", command=fileDirectory, bg="#ec9006", fg="white")
 yes_button.pack(side="left", padx=40, pady=20)
-#Button if pressed opens the file directory to then select a file
+# Button if pressed opens the file directory to then select a file
 no_button = Button(root, text="     Close     ", command=sys.exit, bg="#ec9006", fg="white")
 no_button.pack(side="right", padx=40, pady=20)
-#Button if pressed ends code
-
-root.mainloop() #starts the tkinter waiting for user input
+# Button if pressed ends code
+root.mainloop()  # starts the tkinter waiting for user input
