@@ -11,4 +11,4 @@ Things I Would Change:
 Create more function to make it more modular.
 Could have had the initial word cloud generated then ask if they would like any stop words removed and then generate a new word cloud. 
 Also would've followed better idioms for python next time such as the naming of words next time. 
-With more time I would've liked to  Term Frequency - Inverse Document Frequency (TF-IDF) rather than frequency of word for more accuracy of the context of the text. 
+With more time I would've liked to do Term Frequency - Inverse Document Frequency (TF-IDF) rather than frequency of word for more accuracy of the context of the text. 
