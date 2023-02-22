@@ -22,7 +22,7 @@ def data_preprocessing(text):
         if word not in stop_words:
             remove_stop.append(word)
     tags = nltk.pos_tag(remove_stop)
-    punctRemoved = [(word, tag) for word, tag in tags if word not in string.punctuation]  # Append word for each word in tokens if the word is not in the list of punctuation
+    punctRemoved = [(word, tag) for word, tag in tags if word[0] not in string.punctuation]  # Append word for each word in tokens if the word is not in the list of punctuation
     tag_conversion = {
         'N': 'n',
         'V': 'v',
