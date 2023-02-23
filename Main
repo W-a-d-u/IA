@@ -7,6 +7,10 @@ from tkinter import Tk, filedialog, Button, Label, messagebox  # For the file di
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 
+nltk.download('punkt')  #For tokenizing the string
+nltk.download('averaged_perceptron_tagger')  #Tagging the part of speech
+nltk.download('wordnet')  #Lemmatization
+nltk.download('stopwords')
 
 
 
